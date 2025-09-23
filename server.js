@@ -33,11 +33,13 @@ Student Answer:
 ${answer}
 
 Instructions:
-- Award marks for each rubric point that is clearly addressed.
-- If partially addressed, award half marks.
+- Award marks ONLY if the student's explanation clearly and correctly matches the scientific or engineering principle in the rubric point.
+- Minor rewordings are fine, but if the explanation changes the meaning (e.g., says "same reaction" instead of "opposite reaction"), treat it as incorrect or at most partial credit.
+- If the explanation is incomplete or vague, give partial credit (0.5). 
+- If it is scientifically inaccurate, misleading, or missing, give 0 marks for that rubric point.
 - Provide a breakdown of marks for each point.
-- Give a total score.
-- Write short constructive feedback for the student.
+- Give a total score out of the number of rubric points.
+- Write short constructive feedback highlighting precise errors and missing details.
 - Return ONLY JSON in the format:
 {
   "total": <number>,
@@ -46,6 +48,8 @@ Instructions:
   "feedback": "<text>"
 }
 `;
+
+
 
     const result = await model.generateContent(prompt);
     let text = result.response.text();
