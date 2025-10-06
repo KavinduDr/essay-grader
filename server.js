@@ -1,11 +1,21 @@
 import express from "express";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
+import fs from 'fs';
+import yaml from 'js-yaml';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+// Load OpenAPI spec
+const openApiSpec = yaml.load(fs.readFileSync('./openapi.yaml', 'utf8'));
+
+// Swagger setup
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
 // Middleware
 app.use(express.json());
@@ -65,7 +75,12 @@ Instructions:
     }
 }
 
-// API endpoint
+// Health check endpoint
+app.get("/health", (req, res) => {
+    res.send("Server is healthy");
+});
+
+// Grade Essay API endpoint
 app.post("/grade-essay", async (req, res) => {
     console.log("Incoming body:", req.body); // 👀 debug log
 

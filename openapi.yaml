@@ -1,0 +1,126 @@
+openapi: 3.1.0
+info:
+  title: Essay Grader API
+  description: A rubric-based essay grading tool using Gemini AI
+  version: 1.0.0
+  contact:
+    url: https://github.com/KavinduDr/essay-grader
+servers:
+  - url: http://localhost:5000
+    description: Development server
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Check if the server is running
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Server is healthy"
+  /grade-essay:
+    post:
+      summary: Grade an essay based on rubric
+      description: Grade a student's essay using AI based on provided question and rubric
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+                - rubric
+                - answer
+              properties:
+                question:
+                  type: string
+                  description: The essay question or prompt
+                  example: "Explain Newton's third law of motion with examples"
+                rubric:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of rubric points for grading
+                  example: 
+                    - "States Newton's third law correctly"
+                    - "Provides at least two relevant examples"
+                    - "Explains action-reaction pairs clearly"
+                answer:
+                  type: string
+                  description: The student's essay answer
+                  example: "Newton's third law states that for every action there is an equal and opposite reaction..."
+      responses:
+        '200':
+          description: Essay graded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    description: Total score achieved
+                    example: 2.5
+                  outOf:
+                    type: number
+                    description: Maximum possible score
+                    example: 3
+                  breakdown:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        point:
+                          type: string
+                          description: Rubric point being graded
+                        score:
+                          type: number
+                          description: Score for this rubric point
+                        max:
+                          type: number
+                          description: Maximum score for this rubric point
+                    example:
+                      - point: "States Newton's third law correctly"
+                        score: 1
+                        max: 1
+                      - point: "Provides at least two relevant examples"
+                        score: 0.5
+                        max: 1
+                  feedback:
+                    type: string
+                    description: Constructive feedback for the student
+                    example: "Good understanding of the law. Examples could be more detailed."
+        '400':
+          description: Bad request - missing required fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "question, rubric, and answer are required"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Something went wrong while grading"
+                  raw:
+                    type: string
+                    description: Raw AI response (only present if JSON parsing fails)
+components:
+  securitySchemes: {}
+tags:
+  - name: Health
+    description: Health check operations
+  - name: Grading
+    description: Essay grading operations
