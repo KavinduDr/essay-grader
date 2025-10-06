@@ -19,7 +19,7 @@ if (genAI) {
 
 // Helper function to call Gemini
 async function gradeEssay(question, rubric, answer) {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
     const prompt = `
 You are an exam grader. Grade the student's essay according to the teacher's rubric.
