@@ -2,17 +2,32 @@ import express from "express";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
 import fs from 'fs';
 import yaml from 'js-yaml';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Load OpenAPI spec
-const openApiSpec = yaml.load(fs.readFileSync('./openapi.yaml', 'utf8'));
+// Load OpenAPI spec with proper path resolution
+let openApiSpec;
+try {
+  const specPath = join(__dirname, 'openapi.yaml');
+  openApiSpec = yaml.load(fs.readFileSync(specPath, 'utf8'));
+} catch (error) {
+  console.warn('Could not load OpenAPI spec:', error.message);
+  openApiSpec = {
+    openapi: '3.1.0',
+    info: { title: 'Essay Grader API', version: '1.0.0' },
+    paths: {}
+  };
+}
 
 // Swagger setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
@@ -64,7 +79,7 @@ Instructions:
     const result = await model.generateContent(prompt);
     let text = result.response.text();
 
-    // ✅ Remove code block wrappers if present
+    // Remove code block wrappers if present
     text = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
     try {
@@ -80,9 +95,13 @@ app.get("/health", (req, res) => {
     res.send("Server is healthy");
 });
 
+app.get("/", (req, res) => {
+    res.json({ message: "Essay Grader API", docs: "/api-docs" });
+});
+
 // Grade Essay API endpoint
 app.post("/grade-essay", async (req, res) => {
-    console.log("Incoming body:", req.body); // 👀 debug log
+    console.log("Incoming body:", req.body);
 
     const { question, rubric, answer } = req.body;
 
@@ -99,7 +118,11 @@ app.post("/grade-essay", async (req, res) => {
     }
 });
 
+// For Vercel serverless deployment
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(port, () => {
+        console.log(`Essay grader API running at http://localhost:${port}`);
+    });
+}
 
-app.listen(port, () => {
-    console.log(`Essay grader API running at http://localhost:${port}`);
-});
+export default app;
