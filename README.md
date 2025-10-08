@@ -74,21 +74,3 @@ Return **only JSON** in the following structure:
   ],
   "feedback": "<concise feedback highlighting strengths and weaknesses>"
 }
-
----
-
-##Example
-
-```json
-{
-  "total": 2.5,
-  "outOf": 4,
-  "breakdown": [
-    { "point": "Defines Newton’s Third Law accurately", "score": 1, "max": 1 },
-    { "point": "Explains force interaction pairs", "score": 0.5, "max": 1 },
-    { "point": "Provides a real-world example", "score": 1, "max": 1 },
-    { "point": "Mentions opposite and equal direction correctly", "score": 0, "max": 1 }
-  ],
-  "feedback": "Strong understanding of the principle. However, directionality of forces was incorrectly described as 'same' instead of 'opposite,' leading to loss of accuracy."
-}
-
